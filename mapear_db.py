@@ -1,6 +1,40 @@
 import pandas as pd
 from conexion import get_engine
 
+"""
+📋 Módulo: mapear_db.py
+
+NIVEL: Analysis
+RESPONSABILIDAD PRINCIPAL:
+    Generar un "Diccionario de Datos" legible para una base de datos específica.
+    Este script se conecta a la base definida en la variable 'BASE_A_ANALIZAR'
+    y extrae la estructura de todas las tablas en el esquema 'public'.
+
+MÉTODO DE EXTRACCIÓN:
+    Utiliza el 'information_schema' de PostgreSQL para consultar los nombres
+    de las tablas y sus columnas/tipos de datos. Los resultados se formatean
+    en DataFrames de Pandas para una presentación visual limpia.
+
+DEPENDENCIAS:
+    - pandas (para la extracción y el formato tabular).
+    - from conexion import get_engine (para la conexión).
+
+FUNCIÓN PRINCIPAL: obtener_diccionario_datos()
+    Itera sobre las tablas y ejecuta una consulta detallada por cada una.
+
+CONFIGURACIÓN REQUERIDA:
+    La variable global 'BASE_A_ANALIZAR' debe ser ajustada manualmente dentro
+    del script para apuntar a la base de datos objetivo.
+
+USO:
+    Ejecutar directamente desde la terminal:
+    $ python mapear_db.py
+
+SALIDA:
+    Imprime en la consola un listado secuencial de todas las tablas,
+    mostrando para cada una: el nombre de la columna y el tipo de dato.
+"""
+
 # --- CONFIGURACIÓN ---
 # Aquí escribes la base que quieres investigar
 BASE_A_ANALIZAR = "retaildw" 

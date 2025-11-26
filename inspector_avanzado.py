@@ -1,6 +1,33 @@
 from sqlalchemy import inspect
 from conexion import get_engine
 
+"""
+⚙️ Módulo: inspector_avanzado.py
+
+NIVEL: Engineering (Eng)
+RESPONSABILIDAD:
+    Utiliza el SQLAlchemy Inspector para realizar una auditoría completa del
+    esquema de una base de datos PostgreSQL específica (definida por NOMBRE_BD).
+    Este script está diseñado para detectar y reportar:
+    1. Las columnas y sus tipos de datos.
+    2. Las restricciones de Clave Primaria (Primary Key - PK).
+    3. Las Claves Foráneas (Foreign Keys - FK) y las relaciones que definen.
+
+USO:
+    1. Asegúrese de que el archivo '.env' esté configurado correctamente.
+    2. Ejecute el script directamente desde la terminal:
+       $ python inspector_avanzado.py
+
+CONFIGURACIÓN:
+    Requiere que la función 'get_engine' esté disponible en 'conexion.py'.
+    La variable NOMBRE_BD debe ser actualizada si se audita una base diferente
+    a la predeterminada (retaildw).
+
+SALIDA:
+    Imprime en la consola un reporte estructurado y legible con los detalles
+    técnicos de cada tabla encontrada en el esquema 'public'.
+"""
+
 # --- CONFIGURACIÓN ---
 # 1. Definimos el nombre en una variable para usarlo en la conexión Y en el título
 NOMBRE_BD = "retaildw" 

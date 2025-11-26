@@ -83,12 +83,19 @@ python mapear_db.py
 *Salida: Dataframe con tablas y tipos de datos*
 
 ### C. Auditoría Avanzada de Esquema
-Detecta PKs y FKs automáticamente.
+Para auditar la arquitectura interna, llaves primarias y relaciones entre tablas:
 
 ```bash
 python inspector_avanzado.py
 ```
 *Salida: Reporte detallado de relaciones entre tablas*
+
+## 🔐 Buenas Prácticas Implementadas
+
+* **Seguridad:** El archivo `.gitignore` excluye explícitamente `.env` y la carpeta `.venv`, preveniendo fugas de credenciales.
+* **Modularidad:** Principio de responsabilidad única. La lógica de conexión está desacoplada de la lógica de negocio.
+* **Abstracción:** Uso híbrido de `Pandas` (para lectura visual rápida) y `SQLAlchemy Inspector` (para obtención de metadatos técnicos agnósticos de la base de datos).
+
 
 ## 🤝 Contribuciones
 ¡Las contribuciones son bienvenidas! Si deseas mejorar las herramientas o agregar nuevas funcionalidades, por favor sigue estos pasos:

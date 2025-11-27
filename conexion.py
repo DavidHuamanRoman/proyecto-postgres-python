@@ -8,78 +8,79 @@ from dotenv import load_dotenv
 NIVEL: Core
 RESPONSABILIDAD PRINCIPAL:
     Gestionar la conexión segura a la base de datos PostgreSQL.
-    Este módulo abstrae el manejo de credenciales, leyéndolas exclusivamente
-    del archivo de variables de entorno (.env) para evitar exponerlas
-    en el código fuente (hardcodeo).
+    Implementa lógica "Multi-entorno" para alternar entre desarrollo local
+    y producción (Supabase) sin cambiar el código, solo mediante configuración.
 
 DEPENDENCIAS:
     - os, sqlalchemy, dotenv.
-    - Requiere que el archivo '.env' esté presente en la raíz del proyecto.
+    - Requiere archivo '.env' con variable 'ENV' ('local' o 'supabase').
 
 FUNCIÓN PRINCIPAL: get_engine(nombre_base_datos=None)
-    Crea y devuelve un objeto SQLAlchemy Engine.
+    Crea y devuelve un objeto SQLAlchemy Engine según el entorno activo.
 
     Args:
-        nombre_base_datos (str): Nombre de la base de datos a la que se desea
-                                 conectar. Si es nulo (None), se conecta a la
-                                 base de datos por defecto configurada en .env.
+        nombre_base_datos (str): Opcional. Sobrescribe la base de datos destino.
+                                 Útil en local si tienes múltiples bases.
+                                 En Supabase, usualmente se mantiene la default 'postgres'.
 
     Raises:
-        ValueError: Si la variable 'DB_PASS' no se encuentra en el entorno,
-                    indicando una configuración incompleta de seguridad.
-
-USO EN OTROS MÓDULOS:
-    - La función 'get_engine' debe ser importada por cualquier script que
-      necesite interactuar con la base de datos (Ej: 'ver_bases.py', etc.).
-
-EJEMPLO:
-    # Para usar la base por defecto:
-    # engine = get_engine()
-
-    # Para usar una base específica:
-    # engine = get_engine("mi_otra_base")
+        ValueError: Si faltan credenciales críticas para el entorno seleccionado.
 """
 
 # 1. Cargar las variables del archivo .env
 load_dotenv()
 
-# 2. Leer las credenciales comunes
-DB_USER = os.getenv('DB_USER')
-DB_PASS = os.getenv('DB_PASS')
-DB_HOST = os.getenv('DB_HOST')
-DB_PORT = os.getenv('DB_PORT')
-DB_NAME_DEFAULT = os.getenv('DB_NAME') # La base de datos "por defecto"
-
 def get_engine(nombre_base_datos=None):
     """
-    Crea el motor de conexión.
-    
-    Args:
-        nombre_base_datos (str): Opcional. Si lo escribes, conecta a esa base.
-                                 Si lo dejas vacío, usa la del archivo .env.
+    Crea el motor de conexión usando el driver psycopg2 (más estable).
     """
+    load_dotenv() # Aseguramos cargar las variables
     
-    # Verificación de seguridad
-    if not DB_PASS:
-        raise ValueError("Error: No se encontró la contraseña en el archivo .env")
-        
-    # Lógica de decisión: ¿Qué base de datos usamos?
-    if nombre_base_datos:
-        base_objetivo = nombre_base_datos
-    else:
-        base_objetivo = DB_NAME_DEFAULT
+    modo_entorno = os.getenv('ENV', 'local').lower()
+    args_conexion = {}
 
-    # Creamos la cadena de conexión con la base elegida
-    connection_string = f"postgresql+psycopg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{base_objetivo}"
+    if modo_entorno == 'supabase':
+        user = os.getenv('SUPABASE_USER')
+        password = os.getenv('SUPABASE_PASS')
+        host = os.getenv('SUPABASE_HOST')
+        port = os.getenv('SUPABASE_PORT')
+        db_name_default = os.getenv('SUPABASE_NAME')
+        prefix_log = "☁️ [NUBE] Supabase"
+        
+        # SSL obligatorio para Supabase
+        args_conexion = {"sslmode": "require"}
+        
+    else:
+        user = os.getenv('LOCAL_USER')
+        password = os.getenv('LOCAL_PASS')
+        host = os.getenv('LOCAL_HOST')
+        port = os.getenv('LOCAL_PORT')
+        db_name_default = os.getenv('LOCAL_NAME')
+        prefix_log = "💻 [LOCAL] PC"
+
+    if not password or not user or not host:
+        raise ValueError(f"❌ Error: Faltan credenciales para {modo_entorno}")
+
+    base_objetivo = nombre_base_datos if nombre_base_datos else db_name_default
+
+    # CAMBIO IMPORTANTE: Usamos 'postgresql+psycopg2' en lugar de 'psycopg'
+    connection_string = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{base_objetivo}"
     
-    engine = create_engine(connection_string)
+    # Creamos el engine con un timeout de conexión para que no se cuelgue eternamente
+    engine = create_engine(
+        connection_string, 
+        connect_args=args_conexion,
+        pool_pre_ping=True # Verifica que la conexión esté viva antes de usarla
+    )
+    
     return engine
 
 if __name__ == "__main__":
-    # Prueba rápida
+    # Prueba rápida de conexión al ejecutar este archivo directamente
     try:
-        engine = get_engine() # Probamos la conexión por defecto
+        engine = get_engine()
+        modo = os.getenv('ENV', 'local').upper()
         with engine.connect() as conn:
-            print(f"✅ Conexión exitosa a la base por defecto: {DB_NAME_DEFAULT}")
+            print(f"✅ ¡ÉXITO! Conectado correctamente al entorno: {modo}")
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ FALLO DE CONEXIÓN: {e}")

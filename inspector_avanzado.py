@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import inspect
 from conexion import get_engine
 
@@ -30,7 +32,9 @@ SALIDA:
 
 # --- CONFIGURACIÓN ---
 # 1. Definimos el nombre en una variable para usarlo en la conexión Y en el título
-NOMBRE_BD = "retaildw" 
+load_dotenv()
+
+NOMBRE_BD = os.getenv("NOMBRE_BD_AUDITORIA", "postgres")
 
 # 2. Conectamos usando esa variable
 engine = get_engine(NOMBRE_BD)
@@ -76,4 +80,8 @@ def auditar_base_datos():
         print("\n")
 
 if __name__ == "__main__":
-    auditar_base_datos()
+    try:
+        auditar_base_datos()
+    except Exception as e:
+        print(f"❌ Error durante la auditoría: {e}")
+        print(f"💡 Verifica que la base de datos '{NOMBRE_BD}' exista realmente.")

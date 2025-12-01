@@ -2,4 +2,4 @@
 __pycache__/
 *.pyc
 .env
-scripts.py
+scripts.ipynb

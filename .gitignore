@@ -2,13 +2,11 @@
 .venv/
 .env
 __pycache__/
-
+# Ignorar el archivo de prácticas de Jupyter Notebook
 notebooks/00_playground.ipynb
-
+# Ignorar archivos de bases de datos
 data/
-
 # Ignorar toda la carpeta de configuración de VS Code...
 .vscode/
-
 # ...PERO obligar a subir el archivo de configuración del proyecto
 !.vscode/settings.json

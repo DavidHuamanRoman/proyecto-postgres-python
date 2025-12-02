@@ -1,5 +1,8 @@
+# Ignorar el entorno virtual y variables
 .venv/
-__pycache__/
-*.pyc
 .env
-scripts.ipynb
+__pycache__/
+
+notebooks/00_playground.ipynb
+
+data/

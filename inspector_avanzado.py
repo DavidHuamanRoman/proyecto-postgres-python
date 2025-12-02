@@ -22,8 +22,7 @@ USO:
 
 CONFIGURACIÓN:
     Requiere que la función 'get_engine' esté disponible en 'conexion.py'.
-    La variable NOMBRE_BD debe ser actualizada si se audita una base diferente
-    a la predeterminada (retaildw).
+    La variable NOMBRE_BD debe ser actualizada.
 
 SALIDA:
     Imprime en la consola un reporte estructurado y legible con los detalles
